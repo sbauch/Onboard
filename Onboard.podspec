@@ -11,5 +11,6 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/mamaral/Onboard.git", :tag => "v2.1.7" }
   s.source_files  = "Source/OnboardingViewController.{h,m}", "Source/OnboardingContentViewController.{h,m}"
   s.requires_arc = true
+  s.dependency   'FLAnimatedImage'
 
 end
