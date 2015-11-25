@@ -9,6 +9,7 @@
 #import "OnboardingContentViewController.h"
 #import "OnboardingViewController.h"
 #import <AVFoundation/AVFoundation.h>
+#import "FLAnimatedImage.h"
 
 static NSString * const kDefaultOnboardingFont = @"Helvetica-Light";
 
@@ -38,24 +39,46 @@ static CGFloat const kMainPageControlHeight = 35;
 @implementation OnboardingContentViewController
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:UIApplicationWillEnterForegroundNotification];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+//Creates the content view using an UIImage
 + (instancetype)contentWithTitle:(NSString *)title body:(NSString *)body image:(UIImage *)image buttonText:(NSString *)buttonText action:(dispatch_block_t)action {
     OnboardingContentViewController *contentVC = [[self alloc] initWithTitle:title body:body image:image buttonText:buttonText action:action];
     return contentVC;
 }
 
 - (instancetype)initWithTitle:(NSString *)title body:(NSString *)body image:(UIImage *)image buttonText:(NSString *)buttonText action:(dispatch_block_t)action {
-    return [self initWithTitle:title body:body image:image buttonText:buttonText actionBlock:^(OnboardingViewController *onboardController) {
+    NSData *imageData = UIImagePNGRepresentation(image);
+    return [self initWithTitle:title body:body imageData:imageData buttonText:buttonText actionBlock:^(OnboardingViewController *onboardController) {
         if(action) action();
     }];
 }
 
 + (instancetype)contentWithTitle:(NSString *)title body:(NSString *)body image:(UIImage *)image buttonText:(NSString *)buttonText actionBlock:(action_callback)actionBlock {
-    OnboardingContentViewController *contentVC = [[self alloc] initWithTitle:title body:body image:image buttonText:buttonText actionBlock:actionBlock];
+    NSData *imageData = UIImagePNGRepresentation(image);
+    OnboardingContentViewController *contentVC = [[self alloc] initWithTitle:title body:body imageData:imageData buttonText:buttonText actionBlock:actionBlock];
     return contentVC;
 }
+
+//ImageData
++ (instancetype)contentWithTitle:(NSString *)title body:(NSString *)body imageData:(NSData *)imageData buttonText:(NSString *)buttonText action:(dispatch_block_t)action {
+    OnboardingContentViewController *contentVC = [[self alloc] initWithTitle:title body:body imageData:imageData buttonText:buttonText action:action];
+    return contentVC;
+}
+
+- (instancetype)initWithTitle:(NSString *)title body:(NSString *)body imageData:(NSData *)imageData buttonText:(NSString *)buttonText action:(dispatch_block_t)action {
+    return [self initWithTitle:title body:body imageData:imageData buttonText:buttonText actionBlock:^(OnboardingViewController *onboardController) {
+        if(action) action();
+    }];
+}
+
++ (instancetype)contentWithTitle:(NSString *)title body:(NSString *)body imageData:(NSData *)imageData buttonText:(NSString *)buttonText actionBlock:(action_callback)actionBlock {
+    OnboardingContentViewController *contentVC = [[self alloc] initWithTitle:title body:body imageData:imageData buttonText:buttonText actionBlock:actionBlock];
+    return contentVC;
+}
+
+//Creates the content view using a videoURL
 
 + (instancetype)contentWithTitle:(NSString *)title body:(NSString *)body videoURL:(NSURL *)videoURL buttonText:(NSString *)buttonText action:(dispatch_block_t)action {
     OnboardingContentViewController *contentVC = [[self alloc] initWithTitle:title body:body videoURL:videoURL buttonText:buttonText action:action];
@@ -63,21 +86,22 @@ static CGFloat const kMainPageControlHeight = 35;
 }
 
 - (instancetype)initWithTitle:(NSString *)title body:(NSString *)body videoURL:(NSURL *)videoURL  buttonText:(NSString *)buttonText action:(dispatch_block_t)action {
-    return [self initWithTitle:title body:body image:nil videoURL:videoURL buttonText:buttonText actionBlock:^(OnboardingViewController *onboardController) {
+    return [self initWithTitle:title body:body imageData:nil videoURL:videoURL buttonText:buttonText actionBlock:^(OnboardingViewController *onboardController) {
         if(action) action();
     }];
 }
 
 + (instancetype)contentWithTitle:(NSString *)title body:(NSString *)body videoURL:(NSURL *)videoURL  buttonText:(NSString *)buttonText actionBlock:(action_callback)actionBlock {
-    OnboardingContentViewController *contentVC = [[self alloc] initWithTitle:title body:body image:nil videoURL:videoURL buttonText:buttonText actionBlock:actionBlock];
+    OnboardingContentViewController *contentVC = [[self alloc] initWithTitle:title body:body imageData:nil videoURL:videoURL buttonText:buttonText actionBlock:actionBlock];
     return contentVC;
 }
 
-- (instancetype)initWithTitle:(NSString *)title body:(NSString *)body image:(UIImage *)image buttonText:(NSString *)buttonText actionBlock:(action_callback)actionBlock {
-    return [self initWithTitle:title body:body image:image videoURL:nil buttonText:buttonText actionBlock:actionBlock];
+//Creates the content view using ImageData and/or a videoURL
+- (instancetype)initWithTitle:(NSString *)title body:(NSString *)body imageData:(NSData *)imageData buttonText:(NSString *)buttonText actionBlock:(action_callback)actionBlock {
+    return [self initWithTitle:title body:body imageData:imageData videoURL:nil buttonText:buttonText actionBlock:actionBlock];
 }
 
-- (instancetype)initWithTitle:(NSString *)title body:(NSString *)body image:(UIImage *)image videoURL:(NSURL *)videoURL buttonText:(NSString *)buttonText actionBlock:(action_callback)actionBlock {
+- (instancetype)initWithTitle:(NSString *)title body:(NSString *)body imageData:(NSData *)imageData videoURL:(NSURL *)videoURL buttonText:(NSString *)buttonText actionBlock:(action_callback)actionBlock {
     self = [super init];
 
     // hold onto the passed in parameters, and set the action block to an empty block
@@ -85,7 +109,7 @@ static CGFloat const kMainPageControlHeight = 35;
     // calling
     _titleText = title;
     _body = body;
-    _image = image;
+    _imageData = imageData;
     _buttonText = buttonText;
     self.videoURL = videoURL;
 
@@ -95,11 +119,11 @@ static CGFloat const kMainPageControlHeight = 35;
     self.movesToNextViewController = NO;
     
     // default icon properties
-    if(_image) {
-		self.iconHeight = _image.size.height;
-		self.iconWidth = _image.size.width;
+    if(_imageData) {
+        UIImage *image = [UIImage imageWithData:_imageData];
+        self.iconHeight = image.size.height;
+		self.iconWidth = image.size.width;
 	}
-    
     else {
 		self.iconHeight = kDefaultImageViewSize;
 		self.iconWidth = kDefaultImageViewSize;
@@ -230,16 +254,29 @@ static CGFloat const kMainPageControlHeight = 35;
     CGFloat horizontalCenter = viewWidth / 2;
     CGFloat contentWidth = viewWidth * kContentWidthMultiplier;
     
-    if (_image) {
-        
+    if (_imageData) {
         // create the image view with the appropriate image, size, and center in on screen
-        _imageView = [[UIImageView alloc] initWithImage:_image];
-        [_imageView setFrame:CGRectMake(horizontalCenter - (self.iconWidth / 2), self.topPadding, self.iconWidth, self.iconHeight)];
-        [self.view addSubview:_imageView];
-    
-    } else if (self.videoURL) {
+ 
+        NSString *imageType = [self contentTypeForImageData:_imageData];
         
+        if ([imageType isEqualToString:@"image/gif"]) {
+            FLAnimatedImage *animatedImage = [FLAnimatedImage animatedImageWithGIFData:_imageData];
+            
+            _animatedImageView = [[FLAnimatedImageView alloc] init];
+            _animatedImageView.animatedImage = animatedImage;
+            [_animatedImageView setFrame:CGRectMake(horizontalCenter - (animatedImage.size.width / 2), self.topPadding, animatedImage.size.width, animatedImage.size.height)];
+            [self.view addSubview:_animatedImageView];
+        } else {
+            UIImage *image = [UIImage imageWithData:_imageData];
+            
+            _imageView = [[UIImageView alloc] initWithImage:image];
+            [_imageView setFrame:CGRectMake(horizontalCenter - (image.size.width / 2), self.topPadding, image.size.width, image.size.height)];
+            [self.view addSubview:_imageView];
+        }
+        
+    } else if (self.videoURL) {
         // or if we have a video create and configure the video player controller
+        
         self.moviePlayerController = [MPMoviePlayerController new];
         self.moviePlayerController.contentURL = self.videoURL;
         self.moviePlayerController.view.frame = self.view.frame;
@@ -305,6 +342,27 @@ static CGFloat const kMainPageControlHeight = 35;
         NSLog(@"thumbnailImageGenerationError %@", error);
         return nil;
     }
+}
+
+- (NSString *)contentTypeForImageData:(NSData *)data {
+    uint8_t c;
+    [data getBytes:&c length:1];
+    
+    switch (c) {
+        case 0xFF:
+            return @"image/jpeg";
+        case 0x89:
+            return @"image/png";
+        case 0x47:
+            return @"image/gif";
+        case 0x49:
+            break;
+        case 0x42:
+            return @"image/bmp";
+        case 0x4D:
+            return @"image/tiff";
+    }
+    return nil;
 }
 
 - (void)handleAppEnteredForeground {

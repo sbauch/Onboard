@@ -129,7 +129,7 @@
 - (void)testActionHandlerWithOnboardController {
     XCTestExpectation *expectation = [self expectationWithDescription:@"callback"];
     OnboardingViewController *onboardingVC = [[OnboardingViewController alloc] initWithBackgroundImage:nil contents:nil];
-    OnboardingContentViewController *contentVC = [[OnboardingContentViewController alloc] initWithTitle:@"T1" body:@"B1" image:nil buttonText:nil actionBlock:^(OnboardingViewController *onboardController) {
+    OnboardingContentViewController *contentVC = [[OnboardingContentViewController alloc] initWithTitle:@"T1" body:@"B1" imageData:nil buttonText:nil actionBlock:^(OnboardingViewController *onboardController) {
         if([onboardingVC isEqual:onboardController]) {
             [expectation fulfill];
         }

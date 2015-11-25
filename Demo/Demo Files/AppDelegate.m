@@ -34,6 +34,7 @@ static NSString * const kUserHasOnboardedKey = @"user_has_onboarded";
 //        self.window.rootViewController = [self generateThirdDemoVC];
 //        self.window.rootViewController = [self generateFourthDemoVC];
 //        self.window.rootViewController = [self generateFifthDemoVC];
+//        self.window.rootViewController = [self generateSixthDemoVC];
         
 //        __weak typeof(self) weakSelf = self;
 //        
@@ -224,6 +225,24 @@ static NSString * const kUserHasOnboardedKey = @"user_has_onboarded";
     onboardingVC.shouldMaskBackground = NO;
     onboardingVC.pageControl.currentPageIndicatorTintColor = [UIColor colorWithRed:239/255.0 green:88/255.0 blue:35/255.0 alpha:1.0];
     onboardingVC.pageControl.pageIndicatorTintColor = [UIColor whiteColor];
+    return onboardingVC;
+}
+
+- (OnboardingViewController *)generateSixthDemoVC {
+    OnboardingContentViewController *firstPage = [[OnboardingContentViewController alloc] initWithTitle:@"\"IF U CANT EXPLAIN IT SIMPLY, U DOAN KNOE IT WELL ENOUGH\"" body:@"                 - lolcat" imageData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"cat1" ofType:@"gif"]] buttonText:nil action:nil];
+    firstPage.titleFontSize = 20;
+
+    OnboardingContentViewController *secondPage = [[OnboardingContentViewController alloc] initWithTitle:@"\"IF U WISH 2 MAK AN APPLE PIE FRUM SCRATCH, U MUST FURST INVENT TEH UNIVERS\"" body:@"                 - lolcat" imageData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"cat2" ofType:@"gif"]] buttonText:nil action:nil];
+    secondPage.titleFontSize = 20;
+    
+    OnboardingContentViewController *thirdPage = [[OnboardingContentViewController alloc] initWithTitle:@"\"DAT WHICH CAN BE ASSERTD WITHOUT EVIDENCE, CAN BE DISMISD WITHOUT EVIDENCE\"" body:@"                 - lolcat" imageData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"cat3" ofType:@"gif"]] buttonText:nil action:nil];
+    thirdPage.titleFontSize = 20;
+    
+    OnboardingViewController *onboardingVC = [[OnboardingViewController alloc] initWithBackgroundImage:nil contents:@[firstPage, secondPage, thirdPage]];
+    onboardingVC.shouldMaskBackground = NO;
+    onboardingVC.titleTextColor = [UIColor colorWithRed:57/255.0 green:57/255.0 blue:57/255.0 alpha:1.0];;
+    onboardingVC.bodyTextColor = [UIColor colorWithRed:244/255.0 green:64/255.0 blue:40/255.0 alpha:1.0];
+    onboardingVC.fontName = @"HelveticaNeue-Italic";
     return onboardingVC;
 }
 
