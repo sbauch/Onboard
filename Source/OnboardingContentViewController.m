@@ -246,11 +246,11 @@ static CGFloat const kMainPageControlHeight = 35;
         self.moviePlayerController.repeatMode = MPMovieRepeatModeOne;
         self.moviePlayerController.controlStyle = MPMovieControlStyleNone;
         
-        UIImageView *thumbnailImageView = [[UIImageView alloc] initWithImage:[self thumbnailImageForVideo:self.videoURL]];
-        thumbnailImageView.frame = self.view.frame;
-        thumbnailImageView.contentMode = UIViewContentModeScaleAspectFit;
+        // UIImageView *thumbnailImageView = [[UIImageView alloc] initWithImage:[self thumbnailImageForVideo:self.videoURL]];
+        // thumbnailImageView.frame = self.view.frame;
+        // thumbnailImageView.contentMode = UIViewContentModeScaleAspectFit;
         
-        [self.moviePlayerController.backgroundView addSubview:thumbnailImageView];
+        // [self.moviePlayerController.backgroundView addSubview:thumbnailImageView];
         
         [self.view addSubview:self.moviePlayerController.view];
     }
