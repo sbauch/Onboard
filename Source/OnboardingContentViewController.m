@@ -231,7 +231,7 @@ static CGFloat const kMainPageControlHeight = 35;
     CGFloat contentWidth = viewWidth * kContentWidthMultiplier;
     
     if (_image) {
-        
+        NSLog('found image?')
         // create the image view with the appropriate image, size, and center in on screen
         _imageView = [[UIImageView alloc] initWithImage:_image];
         [_imageView setFrame:CGRectMake(horizontalCenter - (self.iconWidth / 2), self.topPadding, self.iconWidth, self.iconHeight)];
