@@ -242,7 +242,7 @@ static CGFloat const kMainPageControlHeight = 35;
         // or if we have a video create and configure the video player controller
         self.moviePlayerController = [MPMoviePlayerController new];
         self.moviePlayerController.contentURL = self.videoURL;
-        self.moviePlayerController.view.frame = self.view.frame;
+        self.moviePlayerController.view.frame = CGRectMake(horizontalCenter - (self.iconWidth / 2), self.topPadding, self.iconWidth, self.iconHeight);
         self.moviePlayerController.repeatMode = MPMovieRepeatModeOne;
         self.moviePlayerController.controlStyle = MPMovieControlStyleNone;
         
